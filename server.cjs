@@ -41,6 +41,18 @@ app.get('/', (req, res) => {
 
 // Route to handle contact form submission and send email
 app.post("/send", async (req, res) => {
+  // Check environment variables
+  const requiredEnvVars = ['CLIENT_ID', 'CLIENT_SECRET', 'EMAIL', 'REFRESH_TOKEN'];
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error("❌ Missing environment variables:", missingVars);
+    return res.status(500).json({
+      success: false,
+      error: `Missing environment variables: ${missingVars.join(', ')}`
+    });
+  }
+
   const { name, email, number, subject, message } = req.body;
 
   // Validate input
@@ -94,6 +106,18 @@ app.post("/send", async (req, res) => {
 
   } catch (error) {
     console.error("❌ Error sending email:", error);
+    console.error("❌ Error details:", {
+      message: error.message,
+      code: error.code,
+      response: error.response,
+      stack: error.stack
+    });
+    
+    // Check if it's an OAuth2 token issue
+    if (error.message.includes('invalid_grant') || error.message.includes('token')) {
+      console.error("❌ OAuth2 token issue detected - please refresh your tokens");
+    }
+    
     res.status(500).json({
       success: false,
       error: "Error sending message. Check server logs for details (e.g., expired token)."
