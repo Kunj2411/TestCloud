@@ -8,12 +8,20 @@ const cors = require("cors");
 
 const app = express();
 
+// CORS setup to allow requests from GitHub Pages and localhost
+app.use(cors({
+  origin: [
+    "https://kunj2411.github.io",
+    "http://localhost:3000",
+    "http://localhost:8080"
+  ],
+  credentials: true
+}));
+
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 // Middleware to parse JSON data sent by the fetch API from the client (index.html)
 app.use(express.json());
-// CORS setup to allow the client to talk to the server (especially on localhost)
-app.use(cors());
 
 // Serve static files (like index.html, CSS, JS)
 app.use(express.static(__dirname));
