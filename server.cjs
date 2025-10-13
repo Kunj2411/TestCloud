@@ -8,15 +8,11 @@ const cors = require("cors");
 
 const app = express(); // ✅ Declare app before using it
 
-// Allow only your GitHub Pages domain
-app.use(cors({
-  origin: "https://kunj2411.github.io"
-}));
-
-// CORS setup to allow requests from GitHub Pages and localhost
+// CORS setup to allow requests from GitHub Pages, Render frontend, and localhost
 app.use(cors({
   origin: [
     "https://kunj2411.github.io",
+    "https://testcloud-1-xoxh.onrender.com",
     "http://localhost:3000",
     "http://localhost:8080"
   ],
