@@ -6,7 +6,12 @@ const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const cors = require("cors");
 
-const app = express();
+const app = express(); // ✅ Declare app before using it
+
+// Allow only your GitHub Pages domain
+app.use(cors({
+  origin: "https://kunj2411.github.io"
+}));
 
 // CORS setup to allow requests from GitHub Pages and localhost
 app.use(cors({
@@ -20,7 +25,6 @@ app.use(cors({
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
-// Middleware to parse JSON data sent by the fetch API from the client (index.html)
 app.use(express.json());
 
 // Serve static files (like index.html, CSS, JS)
@@ -41,19 +45,21 @@ app.get('/', (req, res) => {
 
 // Route to handle contact form submission and send email
 app.post("/send", async (req, res) => {
-  // Destructure all five expected fields from the form submission
   const { name, email, number, subject, message } = req.body;
 
-  // Input Validation: Check if all fields are present
+  // Validate input
   if (!name || !email || !number || !subject || !message) {
-    return res.status(400).json({ success: false, error: "All contact fields are required (Name, Email, Phone Number, Subject, Message)." });
+    return res.status(400).json({
+      success: false,
+      error: "All contact fields are required (Name, Email, Phone Number, Subject, Message)."
+    });
   }
 
   try {
-    // Get the OAuth2 access token
+    // Get OAuth2 access token
     const accessToken = await oAuth2Client.getAccessToken();
 
-    // Setup Nodemailer transporter with Gmail OAuth2
+    // Nodemailer transporter setup
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -69,11 +75,8 @@ app.post("/send", async (req, res) => {
     // Email content
     const mailOptions = {
       from: `"Uncore Digital Contact Form" <${process.env.EMAIL}>`,
-      to: process.env.EMAIL, // Send the email to the account you set up
-      // Use the submitted subject in the email subject line
+      to: process.env.EMAIL,
       subject: `[New Inquiry] ${subject} from ${name}`,
-      
-      // Construct the email body with all five fields
       text: `
       *** NEW CONTACT FORM SUBMISSION ***
 
@@ -81,27 +84,29 @@ app.post("/send", async (req, res) => {
       Email: ${email}
       Phone Number: ${number}
       Subject: ${subject}
-      
+
       --- Message ---
       ${message}
       `,
     };
 
-    // Send mail
+    // Send email
     await transporter.sendMail(mailOptions);
 
     console.log("✅ Email sent successfully!");
     res.status(200).json({ success: true, message: "Message sent successfully!" });
+
   } catch (error) {
     console.error("❌ Error sending email:", error);
-    // Log the full error to the console for debugging
-    // console.error(error); 
-    res.status(500).json({ success: false, error: "Error sending message. Check server logs for details (e.g., expired token)." });
+    res.status(500).json({
+      success: false,
+      error: "Error sending message. Check server logs for details (e.g., expired token)."
+    });
   }
 });
 
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
