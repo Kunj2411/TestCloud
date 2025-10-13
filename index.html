@@ -55,7 +55,7 @@
                 message: form.message.value
             };
             try {
-                const response = await fetch('/send', {
+                const response = await fetch('https://testcloud-mfnc.onrender.com/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
