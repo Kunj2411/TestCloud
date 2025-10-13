@@ -6,6 +6,11 @@ const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const cors = require("cors");
 
+// Allow only your GitHub Pages domain
+app.use(cors({
+  origin: "https://kunj2411.github.io"
+}));
+
 const app = express();
 
 // Middleware to parse form data
