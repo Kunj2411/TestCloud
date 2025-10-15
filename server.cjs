@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { sendContactEmail } = await import('./mailer.js'); // 👈 import mailer.js
+const { sendContactEmail } = require('./mailer.cjs'); // 👈 rename mailer file to .cjs and use module.exports
 
 const app = express();
 
