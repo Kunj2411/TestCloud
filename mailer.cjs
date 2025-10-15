@@ -1,15 +1,14 @@
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
 
 const oAuth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
   process.env.REDIRECT_URI
 );
-
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
-export const sendContactEmail = async ({ name, email, number, subject, message }) => {
+async function sendContactEmail({ name, email, number, subject, message }) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -49,4 +48,7 @@ export const sendContactEmail = async ({ name, email, number, subject, message }
     console.error("❌ Error in sendContactEmail:", error);
     return { success: false, error };
   }
-};
+}
+
+module.exports = { sendContactEmail };
+
